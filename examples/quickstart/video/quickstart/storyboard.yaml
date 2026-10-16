@@ -1,0 +1,147 @@
+output: Quickstart-Demo
+transitions: { shot: 0.45, card: 0.6, skip: 0.4 }
+
+scenes:
+  - id: intro
+    card:
+      type: intro
+      kicker: Local quick start
+      title: Project updates, *verified*
+      subtitle: A synthetic end-to-end integration walkthrough
+      chips: [Loopback only, Fictional data, Editable storyboard]
+      footerLeft: Quickstart
+      seconds: 6.5
+      narration: "A project update, delivered and verified end to end."
+
+  - id: problem
+    card:
+      type: bullets
+      icon: x
+      kicker: The problem
+      title: Manual hand-offs add *friction*
+      items:
+        - Re-keying delays the result
+        - Duplicate messages can cause duplicate writes
+        - Operators need a clear outcome
+      seconds: 10
+      narration: "Manual hand-offs are slow, and repeat messages need careful handling."
+
+  - id: requirements
+    card:
+      type: bullets
+      icon: check
+      kicker: Requirements summary
+      title: Validate, deliver, and *verify*
+      items:
+        - Accept one partner update
+        - Apply it once to the target
+        - Read back the result
+      seconds: 10
+      narration: "The goal is one accepted update, one verified write and a clear result."
+
+  - id: architecture
+    card: { type: section, title: How it fits together, subtitle: "One request, one governed path, one verified result" }
+    shots:
+      - id: architecture
+        trim: [loaded, null]
+
+  - id: standins
+    card:
+      type: bullets
+      icon: arrow
+      kicker: About this example
+      title: These systems are *synthetic*
+      items:
+        - The partner workbench and registry run locally
+        - All project records and IDs are fictional
+        - This quick start does not deploy or call Azure resources
+      seconds: 11
+      narration: "The partner and registry are local synthetic stand-ins. This example does not deploy Azure resources."
+
+  - id: submit-usecase
+    card:
+      type: usecase
+      kicker: Use case 1 of 2
+      title: Submit a *project update*
+      summary: A partner sends an update that is accepted and applied to the sample registry.
+      facts:
+        - [Trigger, A partner submits an update]
+        - [Result, Registry read-back is verified]
+      diagram:
+        actor: Partner application
+        system: Sample integration
+        cases:
+          - { text: Send a project update, to: Partner workbench }
+          - { text: Validate the request }
+          - { text: Apply and verify, to: Project registry }
+        systems: [Partner workbench, Project registry]
+      seconds: 12
+      narration: "Use case one: a partner sends a project update, then the sample registry confirms the result."
+    shots:
+      - id: app-submit
+
+  - id: duplicate-usecase
+    card:
+      type: usecase
+      kicker: Use case 2 of 2
+      title: Ignore a *repeat*
+      summary: The partner resends the same event. The registry keeps its current revision rather than applying a second write.
+      facts:
+        - [Trigger, The same event is sent again]
+        - [Result, No second effect]
+      diagram:
+        actor: Partner application
+        system: Sample integration
+        cases:
+          - { text: Resend the same event, to: Partner workbench }
+          - { text: Check the event ID }
+          - { text: Keep the same revision, to: Project registry }
+        systems: [Partner workbench, Project registry]
+      seconds: 12
+      narration: "Use case two: the same event is sent again, and the registry shows no second effect."
+    shots:
+      - id: app-duplicate
+
+  - id: closing
+    card:
+      type: closing
+      title: What you just saw
+      items:
+        - One partner update accepted
+        - The registry read-back confirmed it
+        - A repeated event did not create a second write
+      seconds: 9.5
+      narration: "To recap: a verified update, with duplicate delivery safely handled."
+
+  - id: next
+    card:
+      type: bullets
+      icon: arrow
+      kicker: Next steps
+      title: Connect your *own* Azure environment
+      items:
+        - Replace the local stand-ins with your approved endpoints
+        - Configure identity, networking and monitoring
+        - Review every screen and OCR finding before sharing
+      seconds: 12
+      narration: "Replace the stand-ins, configure your controls and review the video before sharing."
+
+  - id: end
+    card:
+      type: end
+      title: Thank *you*
+      subtitle: Edit the storyboard and rebuild to make this demo your own
+      footerLeft: Azure Demo Video Recorder
+      seconds: 7
+      narration: "Thank you."
+
+captions:
+  - { shot: architecture, at: overview, offset: 0.2, seconds: 3.5, text: "One request follows a single path." }
+  - { shot: architecture, at: source, offset: 0.2, seconds: 3.5, text: "The request starts in the partner workbench." }
+  - { shot: architecture, at: gateway, offset: 0.2, seconds: 3.5, text: "The integration validates and queues the update." }
+  - { shot: architecture, at: target, offset: 0.2, seconds: 3.5, text: "The project registry applies the update once." }
+  - { shot: architecture, at: whole, offset: 0.1, seconds: 3.5, text: "A read-back proves the final result." }
+  - { shot: app-submit, at: form, offset: 0.2, seconds: 3.5, text: "This is the local synthetic partner workbench." }
+  - { shot: app-submit, at: verified, offset: 0.2, seconds: 3.5, text: "The registry read-back confirms revision one." }
+  - { shot: app-duplicate, at: resend, offset: 0.2, seconds: 3.5, text: "The same event arrives again." }
+  - { shot: app-duplicate, at: unchanged, offset: 0.2, seconds: 3.5, text: "Revision one remains unchanged; there was no second write." }

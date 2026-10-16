@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Card</title>
+<style>
+  :root {
+    --bg0: #080b0a; --tx: #f4f6f4; --tx2: #b0bbb4; --tx3: #758079; --accent: #84d6a8;
+    --accent-deep: #3a9c72;
+    --serif: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+    --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg0); color: var(--tx); font-family: var(--sans); }
+  .stage { position: absolute; inset: 0; overflow: hidden; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .0; animation: glow 2.4s ease-out both; }
+  .glow.a { width: 900px; height: 900px; left: -260px; top: -320px; background: radial-gradient(circle, rgba(132,214,168,.34), transparent 65%); }
+  .glow.b { width: 1100px; height: 1100px; right: -380px; bottom: -520px; background: radial-gradient(circle, rgba(58,156,114,.4), transparent 65%); animation-delay: .2s; }
+  .grid { position: absolute; inset: 0; opacity: 0; animation: fade 1.6s ease-out .1s both;
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 64px 64px; mask-image: radial-gradient(ellipse at 40% 45%, #000 20%, transparent 75%); }
+  .accentbar { width: 176px; height: 6px; border-radius: 3px; transform-origin: left; animation: grow .7s cubic-bezier(.2,.8,.2,1) both; background: var(--accent); }
+  .kicker { font-size: 26px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .rise { animation: rise .9s cubic-bezier(.2,.8,.2,1) both; }
+  .fade { animation: fade 1s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes glow { from { opacity: 0; transform: scale(.85); } to { opacity: .55; transform: none; } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-40px); } }
+
+  /* intro */
+  .intro { position: absolute; left: 150px; right: 150px; top: 230px; }
+  .intro .kicker { margin: 34px 0 26px; animation-delay: .35s; }
+  .intro h1 { font-family: var(--serif); font-size: 104px; line-height: 1.02; font-weight: 650; letter-spacing: -.025em; max-width: 1500px; animation-delay: .5s; }
+  .intro h1 em { font-style: normal; color: var(--accent); }
+  .intro .sub { margin-top: 30px; font-size: 36px; line-height: 1.4; color: var(--tx2); max-width: 1350px; animation-delay: .8s; }
+  .chips { display: flex; gap: 14px; margin-top: 54px; }
+  .chip { font-size: 24px; color: var(--tx); padding: 11px 22px; border-radius: 999px; border: 1px solid rgba(132,214,168,.35); background: rgba(132,214,168,.07); }
+  .footer { position: absolute; left: 150px; right: 150px; bottom: 84px; display: flex; justify-content: space-between; font-size: 22px; color: var(--tx3); letter-spacing: .04em; }
+
+  /* section */
+  .section { position: absolute; left: 190px; right: 190px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+  .section .step { font-family: var(--serif); font-size: 30px; font-weight: 600; letter-spacing: .2em; color: var(--accent); display: flex; align-items: center; gap: 22px; animation-delay: .1s; }
+  .section .step::after { content: ""; height: 2px; width: 140px; background: linear-gradient(90deg, var(--accent), transparent); }
+  .section h2 { margin-top: 26px; font-family: var(--serif); font-size: 92px; line-height: 1.05; font-weight: 650; letter-spacing: -.02em; max-width: 1500px; animation-delay: .22s; }
+  .section .sub { margin-top: 28px; font-size: 36px; line-height: 1.4; color: var(--tx2); max-width: 1400px; animation-delay: .45s; }
+  .section .accentbar { position: absolute; left: 0; bottom: 120px; }
+
+  /* time skip */
+  .skip { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; }
+  .clock { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--accent); position: relative; animation-delay: 0s; }
+  .clock i { position: absolute; left: 50%; bottom: 50%; width: 5px; margin-left: -2.5px; background: var(--tx); border-radius: 3px; transform-origin: bottom center; }
+  .clock .m { height: 46px; animation: spin 1.6s cubic-bezier(.45,.05,.3,1) both; }
+  .clock .h { height: 30px; transform: rotate(60deg); background: var(--tx2); }
+  .skip .label { font-family: var(--serif); font-size: 64px; font-weight: 600; animation-delay: .15s; }
+  .skip .sub { font-size: 30px; color: var(--tx2); animation-delay: .3s; }
+
+  /* closing */
+  .closing { position: absolute; left: 190px; right: 190px; top: 0; bottom: 60px; display: flex; flex-direction: column; justify-content: center; }
+  .closing h2 { font-family: var(--serif); font-size: 84px; font-weight: 650; letter-spacing: -.02em; margin: 30px 0 52px; animation-delay: .25s; }
+  .closing ul { list-style: none; display: grid; gap: 24px; }
+  .closing li { display: flex; gap: 22px; align-items: flex-start; font-size: 36px; line-height: 1.3; color: var(--tx); }
+  .closing li b { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(127,186,0,.16); color: #a6e22e; font-size: 26px; margin-top: 2px; }
+
+  /* bullets: problem statements, agenda, next steps */
+  .bullets { position: absolute; left: 190px; right: 190px; top: 0; bottom: 40px; display: flex; flex-direction: column; justify-content: center; }
+  .bullets .kicker { margin: 28px 0 0; animation-delay: .2s; }
+  .bullets h2 { font-family: var(--serif); font-size: 80px; line-height: 1.05; font-weight: 650; letter-spacing: -.02em; margin: 18px 0 18px; animation-delay: .3s; }
+  .bullets h2 em { font-style: normal; color: var(--accent); }
+  .bullets .sub { font-size: 32px; line-height: 1.4; color: var(--tx2); margin-bottom: 18px; max-width: 1450px; animation-delay: .45s; }
+  /* Optional paragraph under the title (overview / "what is it" cards): about 65-70 characters a line. */
+  .bullets .body { margin-top: 42px; font-size: 32px; line-height: 1.5; color: var(--tx2); max-width: 1040px; animation-delay: .55s; }
+  .bullets .body + ul { margin-top: 34px; }
+  .bullets ul { list-style: none; margin-top: 30px; display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: 26px 70px; }
+  .bullets li { display: flex; gap: 22px; align-items: flex-start; font-size: 34px; line-height: 1.3; color: var(--tx); }
+  .bullets li b { flex: none; min-width: 48px; height: 48px; padding: 0 8px; border-radius: 12px; display: grid; place-items: center; font-size: 24px; font-weight: 700; margin-top: -2px; }
+  .bullets.icon-x li b { background: rgba(242,80,34,.16); color: #ff8a65; }
+  .bullets.icon-num li b { background: rgba(132,214,168,.12); color: var(--accent); }
+  .bullets.icon-arrow li b { background: rgba(132,214,168,.12); color: var(--accent); }
+  .bullets.icon-check li b { background: rgba(127,186,0,.16); color: #a6e22e; border-radius: 50%; }
+
+  /* use case: explanation on the left, simple UML use-case diagram on the right */
+  .uc-text { position: absolute; left: 150px; width: 700px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+  .uc-text .kicker { margin: 30px 0 0; animation-delay: .15s; }
+  .uc-text h2 { font-family: var(--serif); font-size: 76px; line-height: 1.04; font-weight: 650; letter-spacing: -.02em; margin: 16px 0 24px; animation-delay: .25s; }
+  .uc-text h2 em { font-style: normal; color: var(--accent); }
+  .uc-text .sub { font-size: 30px; line-height: 1.42; color: var(--tx2); animation-delay: .4s; }
+  .uc-facts { margin-top: 40px; display: grid; gap: 20px; }
+  .uc-facts div { display: grid; grid-template-columns: 150px 1fr; gap: 18px; align-items: baseline; font-size: 27px; line-height: 1.3; color: var(--tx); }
+  .uc-facts span { font-size: 19px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .uc-diagram { position: absolute; left: 900px; top: 190px; width: 940px; height: 700px; }
+  .uc-diagram svg { position: absolute; inset: 0; overflow: visible; }
+  .uc-diagram .bound { fill: rgba(132,214,168,.035); stroke: rgba(132,214,168,.45); stroke-width: 2; }
+  .uc-diagram .link { stroke: rgba(244,244,247,.6); stroke-width: 2.5; fill: none; }
+  .uc-diagram .rel { stroke: rgba(132,214,168,.8); stroke-width: 2.5; stroke-dasharray: 9 7; fill: none; }
+  .uc-diagram .person { stroke: var(--tx); stroke-width: 4; fill: none; stroke-linecap: round; }
+  .uc-diagram .rel-label { fill: var(--accent); font-size: 19px; font-family: var(--sans); }
+  .uc-node { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .uc-sys-name { left: 165px; width: 550px; top: 42px; font-size: 19px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .uc-oval { border-radius: 50%; padding: 0 34px; font-size: 23px; line-height: 1.22; color: var(--tx); border: 2px solid rgba(255,255,255,.4); background: rgba(255,255,255,.045); }
+  .uc-oval.main { border: 3px solid var(--accent); background: rgba(132,214,168,.14); font-size: 28px; font-weight: 600; }
+  .uc-oval.alt { border-color: rgba(255,138,101,.85); background: rgba(242,80,34,.1); }
+  .uc-actor-name { width: 170px; font-size: 20px; line-height: 1.2; color: var(--tx); }
+  .uc-box { width: 180px; height: 104px; border-radius: 12px; border: 2px solid rgba(255,255,255,.4); background: rgba(255,255,255,.045); font-size: 21px; line-height: 1.2; color: var(--tx); padding: 0 10px; }
+  .uc-box small { font-size: 15px; color: var(--tx3); margin-bottom: 4px; }
+
+  /* end */
+  .end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 26px; }
+  .end h1 { font-family: var(--serif); font-size: 128px; font-weight: 650; letter-spacing: -.03em; animation-delay: .25s; }
+  .end h1 em { font-style: normal; color: var(--accent); }
+  .end .sub { font-size: 38px; color: var(--tx2); max-width: 1400px; line-height: 1.4; animation-delay: .5s; }
+  .end .lines { margin-top: 18px; display: grid; gap: 12px; font-size: 28px; color: var(--tx3); animation-delay: .8s; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage"></div>
+<script>
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const emph = (s) => esc(s).replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  const backdrop = '<div class="glow a"></div><div class="glow b"></div><div class="grid"></div>';
+  const accentbar = '<div class="accentbar"></div>';
+  // Diagram space is 940 x 700: actor on the left, system boundary in the middle (main use case on top, related
+  // use cases below with dashed <<include>>/<<extend>> arrows), external systems on the right.
+  const useCaseDiagram = (d) => {
+    const B = { x: 165, y: 20, w: 550, h: 660 };
+    const main = { cx: 440, cy: 240, w: 420, h: 136 };
+    const subs = (d.cases || []).slice(1, 3);
+    const subW = subs.length > 1 ? 260 : 380;
+    const sub = subs.map((c, i) => ({ ...c, cx: subs.length > 1 ? (i ? 575 : 305) : 440, cy: 540, w: subW, h: 136 }));
+    const nodes = [{ ...(d.cases || [])[0], ...main }, ...sub];
+    const ex = (n) => ({ l: [n.cx - n.w / 2, n.cy], r: [n.cx + n.w / 2, n.cy], t: [n.cx, n.cy - n.h / 2], b: [n.cx, n.cy + n.h / 2] });
+    const boxes = (d.systems || []).map((name, i, all) => {
+      const linked = nodes.filter((n) => n.to === name);
+      const cy = linked.length ? linked.reduce((s, n) => s + n.cy, 0) / linked.length : 160 + i * (420 / Math.max(1, all.length - 1));
+      return { name, cy, x: 760 };
+    });
+    // Two systems linked to use cases at the same height would sit on top of each other: keep them a box apart.
+    [...boxes].sort((a, b) => a.cy - b.cy).forEach((b, i, all) => { if (i && b.cy < all[i - 1].cy + 124) b.cy = all[i - 1].cy + 124; });
+    const at = (s) => `animation-delay:${s}s`;
+    let svg = `<rect class="bound fade" style="${at(0.35)}" x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" rx="26"/>`;
+    // Actor (stick figure) wired to the main use case.
+    const ax = 62, ay = main.cy - 58;
+    svg += `<g class="fade" style="${at(0.55)}"><circle class="person" cx="${ax}" cy="${ay}" r="22"/>
+      <path class="person" d="M${ax} ${ay + 22} V${ay + 96} M${ax - 40} ${ay + 50} H${ax + 40} M${ax} ${ay + 96} L${ax - 34} ${ay + 150} M${ax} ${ay + 96} L${ax + 34} ${ay + 150}"/>
+      <line class="link" x1="${ax + 48}" y1="${ay + 50}" x2="${ex(nodes[0]).l[0]}" y2="${ex(nodes[0]).l[1]}"/></g>`;
+    sub.forEach((n, i) => {
+      const extend = n.rel === 'extend';
+      const [x1, y1] = extend ? ex(n).t : ex(nodes[0]).b, [x2, y2] = extend ? ex(nodes[0]).b : ex(n).t;
+      const ang = Math.atan2(y2 - y1, x2 - x1), hx = (k) => x2 - 18 * Math.cos(ang + k), hy = (k) => y2 - 18 * Math.sin(ang + k);
+      const mx = (x1 + x2) / 2 + (sub.length > 1 ? (i ? 14 : -14) : 14), my = (y1 + y2) / 2;
+      svg += `<g class="fade" style="${at(1.35 + i * 0.25)}"><path class="rel" d="M${x1} ${y1} L${x2} ${y2}"/>
+        <path class="rel" style="stroke-dasharray:none" d="M${hx(0.45)} ${hy(0.45)} L${x2} ${y2} L${hx(-0.45)} ${hy(-0.45)}"/>
+        <text class="rel-label" x="${mx}" y="${my}" text-anchor="${sub.length > 1 ? (i ? 'start' : 'end') : 'start'}">«${extend ? 'extend' : 'include'}»</text></g>`;
+    });
+    nodes.forEach((n, i) => {
+      const box = boxes.find((b) => b.name === n.to);
+      if (box) svg += `<line class="link fade" style="${at(1.2 + i * 0.25)}" x1="${ex(n).r[0]}" y1="${n.cy}" x2="${box.x}" y2="${box.cy}"/>`;
+    });
+    let html = `<div class="uc-diagram"><svg viewBox="0 0 940 700" width="940" height="700">${svg}</svg>`;
+    html += `<div class="uc-node uc-sys-name fade" style="${at(0.45)}">${esc(d.system)}</div>`;
+    html += `<div class="uc-node uc-actor-name fade" style="left:${ax - 85}px;top:${ay + 162}px;${at(0.6)}">${esc(d.actor)}</div>`;
+    nodes.forEach((n, i) => {
+      html += `<div class="uc-node uc-oval${i ? '' : ' main'}${n.alt ? ' alt' : ''} fade" style="left:${n.cx - n.w / 2}px;top:${n.cy - n.h / 2}px;width:${n.w}px;height:${n.h}px;${at(i ? 1.45 + (i - 1) * 0.25 : 0.8)}">${emph(n.text).replace(/(\w)-(\w)/g, '$1\u2011$2')}</div>`;
+    });
+    boxes.forEach((b, i) => {
+      html += `<div class="uc-node uc-box fade" style="left:${b.x}px;top:${b.cy - 52}px;${at(1.05 + i * 0.2)}"><small>«system»</small>${esc(b.name)}</div>`;
+    });
+    return html + '</div>';
+  };
+  window.render = (spec) => {
+    const stage = document.getElementById('stage');
+    let html = backdrop;
+    if (spec.type === 'intro') {
+      html += `<div class="intro">${accentbar}<div class="kicker fade">${esc(spec.kicker)}</div>
+        <h1 class="rise">${emph(spec.title)}</h1><p class="sub rise">${esc(spec.subtitle)}</p>
+        <div class="chips">${(spec.chips || []).map((c, i) => `<span class="chip rise" style="animation-delay:${1.05 + i * 0.12}s">${esc(c)}</span>`).join('')}</div></div>
+        <div class="footer fade" style="animation-delay:1.3s"><span>${esc(spec.footerLeft)}</span><span>${esc(spec.footerRight)}</span></div>`;
+    } else if (spec.type === 'section') {
+      html += `<div class="section">${spec.step ? `<div class="step rise">${esc(spec.step)}</div>` : ''}
+        <h2 class="rise">${emph(spec.title)}</h2>${spec.subtitle ? `<p class="sub rise">${esc(spec.subtitle)}</p>` : ''}${accentbar}</div>`;
+    } else if (spec.type === 'timeskip') {
+      html += `<div class="skip"><div class="clock fade"><i class="h"></i><i class="m"></i></div>
+        <div class="label rise">${esc(spec.title)}</div>${spec.subtitle ? `<div class="sub rise">${esc(spec.subtitle)}</div>` : ''}</div>`;
+    } else if (spec.type === 'bullets') {
+      const icon = spec.icon ?? 'num';
+      const mark = (i) => ({ x: '✕', num: String(i + 1).padStart(2, '0'), arrow: '→', check: '✓' }[icon] ?? '•');
+      html += `<div class="bullets icon-${icon}" style="--cols:${spec.columns ?? 1}">${accentbar}
+        ${spec.kicker ? `<div class="kicker fade">${esc(spec.kicker)}</div>` : ''}
+        <h2 class="rise">${emph(spec.title)}</h2>${spec.subtitle ? `<p class="sub rise">${esc(spec.subtitle)}</p>` : ''}
+        ${spec.body ? `<p class="body rise">${emph(spec.body)}</p>` : ''}${(spec.items || []).length ? `<ul>
+        ${spec.items.map((t, i) => `<li class="rise" style="animation-delay:${0.6 + i * (spec.stagger ?? 0.2)}s"><b>${mark(i)}</b><span>${emph(t)}</span></li>`).join('')}
+        </ul>` : ''}</div>${spec.footerLeft || spec.footerRight ? `<div class="footer fade" style="animation-delay:1.6s"><span>${esc(spec.footerLeft)}</span><span>${esc(spec.footerRight)}</span></div>` : ''}`;
+    } else if (spec.type === 'usecase') {
+      const nb = (s) => s.replace(/(\w)-(\w)/g, '$1\u2011$2');
+      html += `<div class="uc-text">${accentbar}${spec.kicker ? `<div class="kicker fade">${esc(spec.kicker)}</div>` : ''}
+        <h2 class="rise">${emph(spec.title)}</h2>${spec.summary ? `<p class="sub rise">${nb(emph(spec.summary))}</p>` : ''}
+        <div class="uc-facts">${(spec.facts || []).map(([k, v], i) => `<div class="rise" style="animation-delay:${0.7 + i * 0.18}s"><span>${esc(k)}</span>${nb(emph(v))}</div>`).join('')}</div></div>
+        ${useCaseDiagram(spec.diagram || {})}`;
+    } else if (spec.type === 'end') {
+      html += `<div class="end">${accentbar}<h1 class="rise">${emph(spec.title)}</h1>${spec.subtitle ? `<p class="sub rise">${esc(spec.subtitle)}</p>` : ''}
+        ${(spec.lines || []).length ? `<div class="lines fade">${spec.lines.map((l) => `<div>${esc(l)}</div>`).join('')}</div>` : ''}</div>
+        <div class="footer fade" style="animation-delay:1.2s"><span>${esc(spec.footerLeft)}</span><span>${esc(spec.footerRight)}</span></div>`;
+    } else if (spec.type === 'closing') {
+      html += `<div class="closing">${accentbar}<h2 class="rise">${emph(spec.title)}</h2><ul>
+        ${(spec.items || []).map((t, i) => `<li class="rise" style="animation-delay:${0.55 + i * 0.22}s"><b>✓</b><span>${esc(t)}</span></li>`).join('')}
+        </ul></div><div class="footer fade" style="animation-delay:1.6s"><span>${esc(spec.footerLeft)}</span><span>${esc(spec.footerRight)}</span></div>`;
+    }
+    stage.innerHTML = html;
+    document.getAnimations().forEach((a) => { a.pause(); a.currentTime = 0; });
+  };
+  window.seek = (ms) => { document.getAnimations().forEach((a) => { a.pause(); a.currentTime = ms; }); };
+</script>
+</body>
+</html>

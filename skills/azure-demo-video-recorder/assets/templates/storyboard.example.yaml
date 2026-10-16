@@ -1,0 +1,157 @@
+# Copy and tailor this storyboard. Text and timing edits need only a rebuild.
+# Card details and use-case diagram format: ../references/STORYBOARD.md
+output: Demo-Walkthrough
+transitions: { shot: 0.45, card: 0.6, skip: 0.4 }
+
+# Outputs: voice = narration, nothing drawn on screen (the usual one; ship the -1.15x copy from `npm run speed`).
+# On request: clean (no voice, for live talk-over), captions-voice (works muted) or captions (no voice).
+# With no `voice:` entry (or with --no-voice), a voice version falls back to a clean preview.
+versions: [voice]
+
+# Safety net on the length (default 600 s); raise it only when the script genuinely needs more.
+# maxSeconds: 900
+
+# Optional: choose a provider. API keys belong in environment variables, never here. pronounce fixes names the voice
+# reads wrong (whole words, any case); the screen keeps the written form.
+# voice: { provider: elevenlabs, name: "Voice in My Voices", model: eleven_v4, pronounce: { ACMECLOUD: "Acme Cloud" } }
+
+# A short cut of a longer scenario re-uses its recordings instead of its own:
+# takesFrom: demo-walkthrough
+
+scenes:
+  - id: intro
+    card:
+      type: intro
+      kicker: Integration demonstration
+      title: Projects from intake to *delivery*
+      subtitle: One governed integration path on Azure
+      chips: [Live workflow, Synthetic systems, Fictional data]
+      footerLeft: Demonstration
+      seconds: 6.5
+      narration: "Project updates, delivered and verified end to end."
+
+  - id: problem
+    card:
+      type: bullets
+      icon: x
+      kicker: The problem
+      title: Every hand-off adds *friction*
+      subtitle: Teams need reliable updates without another one-off script.
+      items:
+        - Re-keying delays the result
+        - Different interfaces complicate support
+        - Failures need a visible recovery path
+      seconds: 11
+      narration: "Manual hand-offs are slow, brittle and hard to support."
+
+  - id: agenda
+    card:
+      type: bullets
+      icon: num
+      columns: 2
+      kicker: Agenda
+      title: What you'll see
+      items: [Requirements, Architecture, Azure resources, Use case 1: submit, Use case 2: recover, Production path]
+      seconds: 10
+      narration: "Requirements, architecture, resources, two use cases and the path to production."
+
+  - id: requirements
+    card:
+      type: bullets
+      icon: check
+      kicker: Requirements summary
+      title: A reliable, *governed* integration
+      items:
+        - Accept changes through a documented interface
+        - Validate, queue and deliver once
+        - Trace outcomes and recover failures
+      seconds: 12
+      narration: "The goal is safe intake, reliable delivery, and an auditable recovery path."
+
+  - id: architecture
+    card: { type: section, title: How it fits together, subtitle: "Many ways in, one verified result" }
+    shots:
+      - id: architecture
+        trim: [loaded, null]
+
+  - id: stand-ins
+    card:
+      type: bullets
+      icon: arrow
+      kicker: About this demo
+      title: The systems are *synthetic*
+      items:
+        - The partner app and target registry are local stand-ins
+        - All displayed people and project records are fictional
+        - Azure resources are shown only when you connect your own deployment
+      seconds: 12
+      narration: "The example partner and registry are synthetic; all data is fictional."
+
+  - id: azure
+    card: { type: section, title: What's deployed in Azure, subtitle: "A resource-group tour of your environment" }
+    shots:
+      - id: azure-resources
+
+  - id: usecase-submit
+    card:
+      type: usecase
+      kicker: Use case 1 of 1
+      title: Submit a *project update*
+      summary: A partner sends one update; the workflow validates, queues and applies it once.
+      facts:
+        - [Trigger, A project update arrives]
+        - [Result, Verified in the target registry]
+      diagram:
+        actor: Partner application
+        system: Integration workflow
+        cases:
+          - { text: Submit project update, to: Partner API }
+          - { text: Validate the contract }
+          - { text: Apply and verify, to: Target registry }
+        systems: [Partner API, Target registry]
+      seconds: 12
+      narration: "Use case one: a partner submits a project update, which is validated and verified in the target."
+    shots:
+      - id: app-submit
+        waits: { delivery: { keep: 2 } }
+
+  - id: closing
+    card:
+      type: closing
+      title: What you just saw
+      items:
+        - A change accepted through a governed interface
+        - One verified write to the target
+        - A repeated event has no second effect
+      seconds: 9.5
+      narration: "To recap: governed intake, verified delivery and safe recovery."
+
+  - id: next
+    card:
+      type: bullets
+      icon: arrow
+      kicker: Next steps
+      title: The path to *production*
+      items:
+        - Connect the actual partner and target systems
+        - Configure identity, networking and monitoring
+        - Document runbooks and ownership
+      seconds: 12
+      narration: "Connect real systems, configure controls and hand operations a runbook."
+
+  - id: end
+    card:
+      type: end
+      title: Thank *you*
+      subtitle: Questions and next steps
+      seconds: 7
+      narration: "Thank you."
+
+captions:
+  - { shot: architecture, at: source, offset: 0.3, seconds: 4, text: "A partner request enters through the approved interface." }
+  - { shot: architecture, at: azure, offset: 0.2, seconds: 4, text: "A workflow validates and queues each change." }
+  - { shot: architecture, at: target, offset: 0.2, seconds: 4, text: "The target confirms the final result." }
+  - { shot: azure-resources, at: workflows, offset: 0.2, seconds: 4, text: "The deployed workflows coordinate each step." }
+  - { shot: app-submit, at: form, offset: 0.3, seconds: 4, text: "The partner stand-in submits fictional project data." }
+  - { shot: app-submit, at: submitted, offset: 0.2, seconds: 3.5, text: "Accepted: the update is queued." }
+  - { shot: app-submit, at: verified, offset: 0.2, seconds: 3.5, text: "A read-back confirms the update was applied." }

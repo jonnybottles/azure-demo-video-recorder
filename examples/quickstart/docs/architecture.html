@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample integration architecture</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: #18211b; font: 28px system-ui, sans-serif; }
+    main { width: 1600px; height: 900px; display: grid; place-items: center; }
+    main > svg { width: 1480px; height: 680px; }
+    .box { fill: #f2f7f3; stroke: #4b7258; stroke-width: 3; rx: 22; }
+    .arrow { stroke: #466650; stroke-width: 5; fill: none; marker-end: url(#arrow); }
+    .title { font-size: 34px; font-weight: 700; fill: #18211b; }
+    .label { font-size: 25px; fill: #34473a; }
+  </style>
+</head>
+<body>
+  <main>
+    <svg viewBox="0 0 1480 680" role="img" aria-label="Synthetic project update integration">
+      <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12z" fill="#466650"/></marker></defs>
+      <g id="source">
+        <title>source</title>
+        <rect class="box" x="40" y="230" width="300" height="190"/>
+        <text class="title" x="190" y="300" text-anchor="middle">Partner app</text>
+        <text class="label" x="190" y="350" text-anchor="middle">Project update</text>
+      </g>
+      <path class="arrow" d="M350 325 H565"/>
+      <g id="gateway">
+        <title>gateway</title>
+        <rect class="box" x="585" y="230" width="300" height="190"/>
+        <text class="title" x="735" y="300" text-anchor="middle">API gateway</text>
+        <text class="label" x="735" y="350" text-anchor="middle">Validate and queue</text>
+      </g>
+      <path class="arrow" d="M895 325 H1110"/>
+      <g id="target">
+        <title>target</title>
+        <rect class="box" x="1130" y="230" width="300" height="190"/>
+        <text class="title" x="1280" y="300" text-anchor="middle">Project registry</text>
+        <text class="label" x="1280" y="350" text-anchor="middle">Apply once · verify</text>
+      </g>
+    </svg>
+  </main>
+</body>
+</html>

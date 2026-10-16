@@ -1,0 +1,22 @@
+{
+  "name": "azure-demo-video-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Editable Azure solution demo videos using Playwright and ffmpeg",
+  "scripts": {
+    "check": "node scripts/check-syntax.mjs",
+    "scan:public": "node scripts/check-public-content.mjs",
+    "scan:secrets": "secretlint .",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "playwright": "1.63.0",
+    "tesseract.js": "7.0.0",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@secretlint/secretlint-rule-preset-recommend": "13.0.6",
+    "secretlint": "13.0.6"
+  }
+}

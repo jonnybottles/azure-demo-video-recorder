@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample Partner Workbench</title>
+  <style>
+    :root { color-scheme: light; font: 18px/1.5 system-ui, sans-serif; color: #202922; background: #edf2ee; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .banner { padding: 12px 28px; background: #fff2d8; border-bottom: 1px solid #e6d7b5; font-size: 15px; }
+    header, main { max-width: 1440px; margin: auto; padding: 28px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    h1, h2, p { margin-top: 0; }
+    .brand { font-size: 27px; font-weight: 700; }
+    .brand small { display: block; color: #627066; font-size: 15px; font-weight: 400; }
+    .status { color: #365f43; font-size: 15px; }
+    main { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; }
+    .panel { background: white; border: 1px solid #d4ded6; border-radius: 14px; padding: 26px; box-shadow: 0 5px 18px #304a3610; }
+    .lede { color: #59675e; }
+    label { display: block; margin: 20px 0; font-weight: 650; }
+    input { display: block; width: 100%; margin-top: 8px; border: 1px solid #9aa99e; border-radius: 7px; padding: 12px; font: inherit; }
+    button { border: 0; border-radius: 7px; padding: 12px 18px; background: #367451; color: white; font: inherit; font-weight: 700; cursor: pointer; margin-right: 8px; }
+    button.secondary { background: #e7eee9; color: #284332; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 999px; background: #e7eee9; color: #425349; font-weight: 700; }
+    .badge.ok { background: #e3f4e8; color: #22613b; }
+    dl { display: grid; grid-template-columns: 130px 1fr; gap: 12px; }
+    dt { color: #66746b; }
+    dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; }
+    .event { font: 14px ui-monospace, monospace; }
+    @media(max-width: 800px) { header, main { padding: 18px; } main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="banner"><b>Synthetic demo system.</b> Local-only stand-in; all records are fictional.</div>
+  <header>
+    <div class="brand">Partner Workbench<small>Sample partner application · sends project updates</small></div>
+    <div class="status" id="connection">Connected to local integration</div>
+  </header>
+  <main>
+    <section class="panel">
+      <h1>Send a project update</h1>
+      <p class="lede">The local example accepts an update, applies it to a synthetic registry and reads it back.</p>
+      <label>Project name<input id="name" value="" autocomplete="off" maxlength="100"></label>
+      <button id="submit">Send update</button>
+      <button id="resend" class="secondary" disabled>Resend same event</button>
+      <p style="margin-top:24px"><span id="badge" class="badge">Waiting for an update</span></p>
+    </section>
+    <section class="panel" id="readback">
+      <h2>Registry read-back</h2>
+      <p class="lede">The registry response proves whether the update was applied.</p>
+      <dl>
+        <dt>Project</dt><dd id="project-id">—</dd>
+        <dt>Name</dt><dd id="project-name">—</dd>
+        <dt>Revision</dt><dd id="revision">—</dd>
+        <dt>Event ID</dt><dd id="event-id" class="event">—</dd>
+      </dl>
+    </section>
+  </main>
+  <script>
+    let eventId = `evt-${crypto.randomUUID()}`;
+    const badge = document.querySelector('#badge');
+    async function refresh() {
+      const state = await fetch('/api/state').then((r) => r.json());
+      if (!state.project) return;
+      document.querySelector('#project-id').textContent = state.project.id;
+      document.querySelector('#project-name').textContent = state.project.name;
+      document.querySelector('#revision').textContent = state.revision;
+      document.querySelector('#event-id').textContent = state.eventId;
+      eventId = state.eventId;
+      document.querySelector('#resend').disabled = false;
+      badge.textContent = state.duplicateCount ? 'No second effect' : 'Verified';
+      badge.className = 'badge ok';
+    }
+    document.querySelector('#submit').addEventListener('click', async () => {
+      badge.textContent = 'Queued';
+      badge.className = 'badge';
+      document.querySelector('#resend').disabled = false;
+      await fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Demo-Action': '1' },
+        body: JSON.stringify({ name: document.querySelector('#name').value, eventId }) });
+      await refresh();
+    });
+    document.querySelector('#resend').addEventListener('click', async () => {
+      await fetch('/api/resend', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Demo-Action': '1' },
+        body: JSON.stringify({ eventId }) });
+      await refresh();
+    });
+    void refresh();
+  </script>
+</body>
+</html>

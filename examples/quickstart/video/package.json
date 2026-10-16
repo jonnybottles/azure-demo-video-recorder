@@ -1,0 +1,23 @@
+{
+  "name": "azure-demo-videos",
+  "private": true,
+  "type": "module",
+  "description": "Scripted, editable Azure solution demo videos.",
+  "scripts": {
+    "signin": "node engine/cli.mjs signin",
+    "record": "node engine/cli.mjs record",
+    "build": "node engine/cli.mjs build",
+    "titles": "node engine/cli.mjs titles",
+    "qa": "node engine/cli.mjs qa",
+    "frame": "node engine/cli.mjs frame",
+    "lines": "node engine/cli.mjs lines",
+    "speed": "node engine/cli.mjs speed"
+  },
+  "dependencies": {
+    "jsqr": "1.4.0",
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0",
+    "tesseract.js": "7.0.0",
+    "yaml": "2.9.1"
+  }
+}
