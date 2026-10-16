@@ -13,8 +13,10 @@ validation on those platforms.
 
 ## What it produces
 
-- `-voice.mp4`: title cards and AI or system narration, nothing drawn on screen (the default), plus a
+- `-voice.mp4`: title cards and AI or system narration without burned-in subtitles (the default), plus a
   `-voice-1.15x.mp4` copy from `npm run speed` that keeps the narration in sync
+- Architecture diagrams use narration-synchronized component spotlights by default: dimmed surroundings, a cyan
+  outline, a numbered label and smooth movement between components. These remain enabled in voice-only videos.
 - On request: `-clean.mp4` (no voice, for live talk-over), `-captions-voice.mp4` (works muted) or `-captions.mp4`
 - Per-scene clips, an SRT subtitle file, the timed narration as spoken and OCR contact sheets
 - Short cuts and smaller videos from the same recordings (`takesFrom:`), with no second take
@@ -95,6 +97,8 @@ scaffolding; otherwise run `npx playwright install chromium` when needed. Existi
 3. Write the narration first: lines that explain what each step does and why (not what the screen says), and a
    bridge line at every scene change. Measure it with `npm run lines`.
 4. Script actions in `video/<scenario>/record.mjs`; add marks where lines are spoken and pace each mark to its line.
+   Map each architecture component to an SVG group or DOM selector and use the starter template's spotlight walk,
+   not just a static diagram with cursor hovers.
 5. Record in the isolated browser profile. Never show terminals, code views, credentials, secrets or run payloads.
 6. Inspect frames and title cards, fix every `--plan` warning, build, then make the 1.15x copy.
 7. Run OCR QA on every rendered version and review every contact sheet. Do not share a video with unresolved findings.

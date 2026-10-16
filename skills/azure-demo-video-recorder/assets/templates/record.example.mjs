@@ -1,6 +1,6 @@
 // Example recorder. Copy and customize this module as video/<scenario>/record.mjs.
 // Each shot records one page into frames + marks; the storyboard decides order, captions and cuts.
-// Patterns here are the ones that worked: fractional cursor paths over a diagram, alphabetical portal tours that only
+// Patterns here are the ones that worked: component spotlights over a diagram, alphabetical portal tours that only
 // scroll down, run views by deep link (hover only), and app walkthroughs with a recorded wait for the real outcome.
 // Narrated videos are paced to the script: write the storyboard lines first, run `npm run lines -- <scenario>`, copy
 // the seconds per mark into LINES, and call pace.fill() after each mark so the take is long enough for its line.
@@ -9,10 +9,11 @@ import { pathToFileURL } from 'node:url';
 import { REPO_ROOT, pause as sleep } from '../engine/paths.mjs';
 import { findRun, hoverAll, openPortal, rgFragment, runFragment, subscriptionId } from '../engine/portal.mjs';
 import { paceToScript } from '../engine/helpers.mjs';
+import { clearSpotlight, installSpotlight, regionOf, spotlight } from '../engine/spotlight.mjs';
 
 // ---- Fill these in for the project (fictional data only on screen) ----
 const CONFIG = {
-  architecture: path.join(REPO_ROOT, 'docs', 'architecture.html'), // local HTML or image showing the architecture
+  architecture: path.join(REPO_ROOT, 'docs', 'architecture.html'), // local HTML with addressable diagram components
   resourceGroup: 'rg-demo-integration',
   // Group names alphabetically, matching the portal list, so the tour only scrolls down.
   tour: { workflows: ['la-demo-intake', 'la-demo-delivery'], messaging: ['sb-demo-integration'] },
@@ -21,13 +22,23 @@ const CONFIG = {
   runActions: ['Parse command', 'Map to target', 'Apply update', 'Complete command']
 };
 
+// Replace these SVG titles or use selectors: ['#component'] for the actual diagram. Keep the narration cue marks.
+const ARCHITECTURE_STEPS = [
+  { mark: 'source', svgTitles: ['source'], label: 'Request source' },
+  { mark: 'azure', svgTitles: ['gateway'], label: 'Azure workflow' },
+  { mark: 'target', svgTitles: ['target'], label: 'Verified result' }
+];
+
 // Seconds of speech per shot and mark, from `npm run lines -- <scenario>` (empty until the script is written).
 const LINES = {
+  architecture: { source: 6.0, azure: 6.0, target: 6.0 },
   'app-submit': { form: 9.5, submitted: 8.0, verified: 10.0 }
 };
 const pace = paceToScript(LINES);
 
 export async function setup(ctx) {
+  const selected = process.argv.indexOf('--shot');
+  if (selected >= 0 && process.argv[selected + 1]?.split(',').every((id) => id === 'architecture')) return;
   ctx.state.subscription ??= await subscriptionId();
   // If an App Service Authentication (Easy Auth) app rejects cookie-only writes with an empty 403, attach a short-lived
   // owner token to that host only (never print or store it):
@@ -42,27 +53,32 @@ export const shots = [
     id: 'architecture',
     async run(ctx) {
       const page = await ctx.page('deck', 'about:blank');
+      await page.goto(pathToFileURL(CONFIG.architecture).href);
+      await installSpotlight(page);
+      const steps = [];
+      for (const step of ARCHITECTURE_STEPS) {
+        const rect = await regionOf(page, { svgTitles: step.svgTitles, selectors: step.selectors, pad: 14 });
+        if (!rect || rect.w <= 0 || rect.h <= 0) throw new Error(`Architecture spotlight target missing: ${step.label}`);
+        steps.push({ ...step, rect });
+      }
+      await page.cursor.sync();
       await ctx.recorder.shot(page, 'architecture', async (s) => {
-        await page.goto(pathToFileURL(CONFIG.architecture).href);
+        const mark = pace.marker(s, 'architecture');
         await page.cursor.show(false);
         await page.waitForTimeout(150);
         s.mark('loaded'); // storyboard trims to this mark, so the blank page never shows
         await sleep(2000);
-        const box = await page.evaluate(() => {
-          const items = [...document.querySelectorAll('img, svg, canvas')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 400);
-          items.sort((a, b) => b.width * b.height - a.width * a.height);
-          const r = items[0] ?? { x: 0, y: 0, width: innerWidth, height: innerHeight };
-          return { x: r.x, y: r.y, w: r.width, h: r.height };
-        });
-        const at = (fx, fy) => ({ x: Math.round(box.x + box.w * fx), y: Math.round(box.y + box.h * fy) });
-        await page.cursor.moveTo(at(0.15, 0.5), { ms: 10 });
         await page.cursor.show(true);
-        s.mark('source');
-        await page.cursor.hover(at(0.15, 0.5), 2400);
-        s.mark('azure');
-        await page.cursor.hover(at(0.5, 0.5), 2400);
-        s.mark('target');
-        await page.cursor.hover(at(0.85, 0.5), 2400);
+        for (const [i, step] of steps.entries()) {
+          mark(step.mark);
+          // Omit the step badge if the diagram already numbers its flow.
+          await spotlight(page, step.rect, { label: step.label, step: i + 1 });
+          await page.cursor.moveTo({ x: Math.round(step.rect.x + step.rect.w / 2), y: Math.round(step.rect.y + step.rect.h * 0.55) });
+          await pace.fill();
+        }
+        await clearSpotlight(page);
+        s.mark('whole');
+        await sleep(1000);
       });
     }
   },

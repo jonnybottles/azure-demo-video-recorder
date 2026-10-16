@@ -3,7 +3,8 @@
 output: Demo-Walkthrough
 transitions: { shot: 0.45, card: 0.6, skip: 0.4 }
 
-# Outputs: voice = narration, nothing drawn on screen (the usual one; ship the -1.15x copy from `npm run speed`).
+# Outputs: voice = narration without captions; architecture spotlights stay enabled.
+# Ship the -1.15x copy from `npm run speed`.
 # On request: clean (no voice, for live talk-over), captions-voice (works muted) or captions (no voice).
 # With no `voice:` entry (or with --no-voice), a voice version falls back to a clean preview.
 versions: [voice]

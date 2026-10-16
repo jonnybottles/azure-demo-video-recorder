@@ -46,14 +46,15 @@ export const shots = [
         await sleep(700);
         s.mark('overview');
         await sleep(1200);
-        for (const step of [
+        for (const [i, step] of [
           { mark: 'source', node: 'source', label: 'Partner sends an update' },
           { mark: 'gateway', node: 'gateway', label: 'Validate and queue' },
           { mark: 'target', node: 'target', label: 'Apply once and verify' }
-        ]) {
+        ].entries()) {
           const rect = await regionOf(page, { svgTitles: [step.node], pad: 14 });
+          if (!rect) throw new Error(`Architecture spotlight target missing: ${step.label}`);
           s.mark(step.mark);
-          await spotlight(page, rect, { label: step.label });
+          await spotlight(page, rect, { label: step.label, step: i + 1 });
           await page.cursor.moveTo({ x: Math.round(rect.x + rect.w / 2), y: Math.round(rect.y + rect.h / 2) });
           await sleep(1700);
         }

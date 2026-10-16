@@ -5,7 +5,7 @@ description: >-
   make an end-to-end Azure walkthrough, show deployed Azure resources or a live web app journey (sign-up e-mails,
   authenticator, first sign-in), or add captions or AI narration. Produces editable, re-renderable video from
   Playwright browser capture with a visible cursor, title cards, Azure portal and Microsoft Foundry walkthroughs,
-  business use-case diagrams, narration written first and paced to the script, identifier redaction, OCR checks,
+  business use-case diagrams with component spotlights, narration written first and paced to the script, identifier redaction, OCR checks,
   per-scene clips, short cuts from the same takes and faster re-timed copies. No code is shown on camera. Requires
   Node.js, ffmpeg and an Azure CLI sign-in for portal scenes.
 ---
@@ -16,6 +16,11 @@ Produce scripted, re-renderable demo videos from a storyboard file, recorded off
 default one narrated video (no captions on screen) delivered as a 1.15x copy, plus per-scene clips. The engine in
 `assets/` already solves capture quality, cursor, redaction, portal sign-in quirks, pacing, captions, voice, short
 cuts, re-timing and QA; copy it, do not rebuild it.
+
+**Architecture default:** explain Azure diagrams with a component-by-component spotlight walk, not a static image
+and cursor hovers alone. Use the bundled cyan outline, dimmed surroundings, numbered label and smooth transitions,
+synchronized to the explanation of each component. Keep this visual guidance in voice-only and clean versions;
+"no captions" does not disable spotlights. Omit the effect only when the user explicitly requests it.
 
 ## Prerequisites
 
@@ -35,7 +40,7 @@ Ask, with these defaults:
 | Question | Default |
 | --- | --- |
 | Scenarios and what each must prove | from the repo's README/requirements |
-| Versions | one, unless told otherwise: `voice` (AI narration, no captions, nothing drawn on screen), delivered as the 1.15x copy from `npm run speed -- <scenario> 1.15` (the 1x build stays beside it as the master). Clean (no voice, for live talk-over), captions with voice, or captions only on request (`versions:`, [STORYBOARD](references/STORYBOARD.md), "Narration-first") |
+| Versions | one, unless told otherwise: `voice` (AI narration, no captions; diagram spotlights stay enabled), delivered as the 1.15x copy from `npm run speed -- <scenario> 1.15` (the 1x build stays beside it as the master). Clean (no voice, for live talk-over), captions with voice, or captions only on request (`versions:`, [STORYBOARD](references/STORYBOARD.md), "Narration-first") |
 | Audience / redaction | customer-facing: blur account, tenant, subscription IDs, hostnames, IPs; keep resource names |
 | Length | about 5 minutes for a short demo; 8-9 minutes with the full arc below. A narrated walkthrough has no length target: whatever the script needs (`maxSeconds:` is a safety net). Both a long and a short one? Record once for the full story and cut the short one from the same takes (`takesFrom:`) |
 | Series | smaller videos for a reviewer are scenarios cut from one recording, **never numbered** (no "Module 2 of 4"): more will follow and every count goes stale |
@@ -127,8 +132,13 @@ voice just read what was on the screen"), so write the script before the recorde
 Write one recorder shot per on-screen segment using the template patterns: navigate before `recorder.shot(...)`, a
 mark before each spoken moment (`pace.marker(s, '<shot>')`, then `await pace.fill()` after the action), `s.wait()`
 around slow work, IDs in `ctx.state`. Portal and Foundry shots: [PORTAL_RECIPES](references/PORTAL_RECIPES.md).
-Diagram, configuration and app tours: `engine/spotlight.mjs` (never show code; for API Management policies hide the
-XML tooltips). Live-app journeys (sign-up e-mails, authenticator, idle sign-out, small UI text, reading pages before
+Architecture shots MUST call `installSpotlight`, resolve the actual component regions with `regionOf`, call
+`spotlight` at the corresponding narration marks, and `clearSpotlight` for the closing whole-diagram view. Follow
+the runnable starter template and [STORYBOARD](references/STORYBOARD.md), "Spotlight walks". Fail on a missing
+target; never silently replace the effect with cursor hovers. Use numbered labels unless the diagram already has
+step numbers. Keep the focused component and its label readable and entirely on screen.
+Configuration and app tours can use the same `engine/spotlight.mjs` (never show code; for API Management policies
+hide the XML tooltips). Live-app journeys (sign-up e-mails, authenticator, idle sign-out, small UI text, reading pages before
 scripting them): `engine/helpers.mjs` and "Real sign-ups and one-time links" in [STORYBOARD](references/STORYBOARD.md).
 Read a live page before scripting it: the off-camera `inspectShot()` saves each route's text and a screenshot.
 
@@ -140,6 +150,8 @@ Read a live page before scripting it: the off-camera `inspectShot()` saves each 
    `process.env.DEMO_DRY` and skips that click). Narrated takes record well with `DEMO_PACE=2.2`.
 2. After each shot: `npm run frame -- <scenario> <shot> <mark> 1.5` and **view the JPEG**. Check cursor position,
    blur, clipped controls, unexpected dialogs. Then `npm run build -- <scenario> --plan --partial`.
+   For an architecture walk, inspect every focus step, a transition and the closing whole-diagram view; confirm
+   the spotlight follows the spoken component, dims unrelated regions and does not clip labels.
 3. Fix and re-record only the failing shot. Unknown failures: check [PITFALLS](references/PITFALLS.md) first. A shot
    that clicks something irreversible cannot be re-taken: splice a re-takeable segment into it instead
    ([STORYBOARD](references/STORYBOARD.md), "Splicing").

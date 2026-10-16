@@ -54,6 +54,11 @@ box on the right. Keep labels to 2-5 words; hyphens are made non-breaking.
 
 ## Spotlight walks (diagrams, portal views, demo apps)
 
+**Required default for Azure architecture diagrams, including voice-only videos.** A static diagram with cursor
+hovers is not a spotlight walk. Use the bundled cyan outline and dimmed surroundings, with a numbered pill label
+and smooth movement between components as their explanations begin. Start and finish with a whole-diagram view.
+Skip the effect only if the user explicitly asks for a different presentation.
+
 `engine/spotlight.mjs`: `installSpotlight(page)`, `regionOf(page, { svgTitles | selectors, pad })`,
 `spotlight(page, rect, { label, step })`, `clearSpotlight(page)`. It dims everything except one rectangle and shows a
 numbered label; works over any page and over portal iframes (use `locator.boundingBox()` for the rect). Use it to:
@@ -61,6 +66,12 @@ numbered label; works over any page and over portal iframes (use `locator.boundi
 - explain configuration without code (e.g. API Management Design-view policy blocks: "IP allow-list", "Token check");
 - tour a demo app before using it ("Synthetic partner system", "Signs in with OAuth", "Proof it was applied").
 One caption per step; dwell about 6.5-8.5 s (`sleep(3900-5000)` × PACE).
+
+Map the real SVG titles or DOM selectors in the recorder's `ARCHITECTURE_STEPS`, retaining the storyboard's cue
+marks. Never guess broad screen fractions or silently continue when a region is missing. Validate every region
+before the shot starts. Prefer the component plus its incoming edge, excluding unrelated neighbors. Number the
+labels unless the diagram already numbers its flow. Use measured narration with `paceToScript`, and inspect a
+frame from every step plus the closing full view; the bright region and its label must stay on screen.
 
 ### Architecture diagrams as code (Python `diagrams`)
 
@@ -96,7 +107,7 @@ Rules of thumb:
 
 ## Narration-first (voice without captions)
 
-When the voice is the point (`versions: [voice]`, nothing drawn on screen), write the script before the
+When the voice is the point (`versions: [voice]`, no subtitle overlays; diagram spotlights remain), write the script before the
 recorder and pace the recording to fit it, not the other way round:
 
 1. **Write every line first**: card `narration:` and one `say:` per cue (`text:` stays a one-line summary for
@@ -301,7 +312,7 @@ One output by default, delivered at 1.15x:
 
 | File | Use |
 | --- | --- |
-| `<output>-voice.mp4` | AI narration, no captions, nothing drawn on screen: the 1x master |
+| `<output>-voice.mp4` | AI narration, no captions, architecture spotlights retained: the 1x master |
 | `<output>-voice-1.15x.mp4` | The same, re-timed by `npm run speed -- <scenario> 1.15`: the file that ships |
 
 `versions: [voice]` is the default to write in the storyboard. Others only when someone asks: `clean` (no captions,

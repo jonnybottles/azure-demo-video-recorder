@@ -115,6 +115,10 @@ test('public skill metadata and linked references are self-contained', () => {
   const metadata = YAML.parse(match[1]);
   assert.equal(metadata.name, 'azure-demo-video-recorder');
   assert.ok(metadata.description.length <= 1024);
+  assert.ok(source.split(/\r?\n/).length <= 500);
+  assert.match(source, /Architecture default/);
+  assert.match(source, /no captions" does not disable spotlights/);
+  assert.match(source, /Post-Run Reflection/);
   for (const [, relative] of source.matchAll(/\]\((references\/[^)#]+\.md)(?:#[^)]*)?\)/g)) {
     assert.ok(fs.existsSync(path.join(path.dirname(skillFile), relative)), `missing skill reference: ${relative}`);
   }
